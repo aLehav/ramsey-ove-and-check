@@ -8,7 +8,7 @@ that can be leveraged with counterexample sets, such as those
 offered by `Brendan McKay <https://users.cecs.anu.edu.au/~bdm/data/ramsey.html>`_
 
 Check out the :doc:`usage` section for further information, including
-how to :ref:`instal` the project.
+how to :ref:`installation` the project.
 
 .. note::
 
