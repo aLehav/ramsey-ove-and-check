@@ -1,9 +1,9 @@
-Template for the Read the Docs tutorial
-=======================================
+Ramsey One-Vertex Extension and Checking (ROVEaC)
+=================================================
 
-This GitHub template includes fictional Python library
-with some basic Sphinx docs.
+This is the repo for Ramsey theory utilities assisting in one-vertex extension and 
+counterexample checking.
 
-Read the tutorial here:
+Read the documentaion here:
 
-https://docs.readthedocs.io/en/stable/tutorial/
+https://ramsey-ove-and-check.readthedocs.io/en/latest/
