@@ -6,3 +6,4 @@ build-backend = "flit_core.buildapi"
 name = "roveac"
 authors = [{name = "Adam Lehavi", email = "adamlehavi@gmail.com"}]
 dynamic = ["version", "description"]
+readme = "README.rst"
