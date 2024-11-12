@@ -7,3 +7,7 @@ name = "roveac"
 authors = [{name = "Adam Lehavi", email = "adamlehavi@gmail.com"}]
 dynamic = ["version", "description"]
 readme = "README.rst"
+
+[project.urls]
+Homepage = "https://github.com/aLehav/ramsey-ove-and-check"
+Documentation = "https://ramsey-ove-and-check.readthedocs.io/en/latest/"
