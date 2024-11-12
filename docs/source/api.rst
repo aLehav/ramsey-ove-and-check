@@ -2,8 +2,9 @@ API
 ===
 
 
-.. automodule:: roveac
-   :members:
-   :undoc-members:
-   :inherited-members:
-   :show-inheritance:
+.. autosummary::
+   :toctree: generated
+   :recursive:
+
+   roveac
+   roveac.counter_checkers.counter_checker.CounterChecker
