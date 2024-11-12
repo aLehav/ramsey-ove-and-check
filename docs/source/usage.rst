@@ -12,23 +12,20 @@ To use ROVEaC, first install it using pip:
 
    (.venv) $ pip install roveac
 
-Creating recipes
-----------------
+Usage Examples
+--------------
 
-To retrieve a list of random ingredients,
-you can use the ``roveac.get_random_ingredients()`` function:
+### Checking for Ramsey Counterexamples
 
-.. autofunction:: roveac.get_random_ingredients
+To check if a graph is a Ramsey counterexample, use the `CounterChecker` module:
 
-The ``kind`` parameter should be either ``"meat"``, ``"fish"``,
-or ``"veggies"``. Otherwise, :py:func:`roveac.get_random_ingredients`
-will raise an exception.
+.. code-block:: python
 
-.. autoexception:: roveac.InvalidKindError
+   from roveac.counter_checkers import CounterChecker
+   import networkx as nx
 
-For example:
+   G = nx.complete_graph(5)  # Example graph
+   result = CounterChecker.check(G)
+   print("Is counterexample:", result)
 
->>> import roveac
->>> roveac.get_random_ingredients()
-['shells', 'gorgonzola', 'parsley']
-
+More details on each module are available in the :doc:`api` section.
