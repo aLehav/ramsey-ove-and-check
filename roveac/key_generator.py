@@ -2,8 +2,8 @@
 Key Generators
 ====================
 
-This module provides the `KeyGenerator` abstract base class, which defines a method
-for generating a key from a graph for use in dictionary generation and hashing.
+This module provides the `KeyGenerator` class, which defines a method for generating a key 
+from a graph for use in dictionary generation and hashing.
 
 Classes
 -------
@@ -15,29 +15,30 @@ Sub3Generator : KeyGenerator
     Generates key for all subgraphs of size 3 through each vertex.
 """
 
-from abc import ABC
 import networkx as nx
 from collections import Counter
 from itertools import combinations
 
-class KeyGenerator(ABC):
+class KeyGenerator:
     """
-    Abstract base class for generating a unique key from a graph, intended for use
+    Class for generating a unique key from a graph, intended for use
     in dictionary generation and hashing.
 
     Methods
     -------
-    generate_key(G)
+    generate_key(method: str, G: nx.Graph)
         Produces a key based on the given graph.
     """
     @classmethod
-    def generate_key(cls, G):
+    def generate_key(cls, method: str, G: nx.Graph):
         """
         Generate a unique key for the provided graph `G`.
 
         Parameters
         ----------
-        G : Graph
+        method : str
+            Denotes which method to use to construct the dictionary.
+        G : nx.Graph
             The graph from which to generate the key.
 
         Returns
@@ -45,23 +46,14 @@ class KeyGenerator(ABC):
         key
             A unique identifier generated from the graph.
         """
-
-class TriangleGenerator(KeyGenerator):
-    """
-    Generates a unique key based on triangle counts for each node in a graph.
-
-    This class extends `KeyGenerator` to provide a method that creates a key 
-    representing the distribution of triangles in the graph, facilitating graph 
-    comparisons in applications where triangle structures are relevant.
-
-    Methods
-    -------
-    generate_key(G: nx.Graph) -> tuple
-        Generates a sorted tuple key based on the triangle counts for nodes in `G`.
-    """
+        if method == "triangle":
+            return cls._triangle_generate_key(G)
+        if method == "sub_3":
+            return cls._sub_3_generate_key(G)
+        raise ValueError("Unknown method for generate key")
 
     @classmethod
-    def generate_key(cls, G: nx.Graph) -> tuple:
+    def _triangle_generate_key(cls, G: nx.Graph) -> tuple:
         """
         Generate a unique key for the graph `G` based on the count of triangles at each node.
 
@@ -83,27 +75,8 @@ class TriangleGenerator(KeyGenerator):
         triangle_count = nx.triangles(G)
         return tuple(sorted((count for count in triangle_count.values()), reverse=True))
 
-class Sub3Generator(KeyGenerator):
-    """
-    Generates a unique key based on counts of subgraphs of size 3 for each node in a graph.
-
-    This class extends `KeyGenerator` to create a key that represents the structure of 
-    subgraphs of size 3 for each node, categorized by the number of edges in each subgraph.
-
-    Methods
-    -------
-    _subgraphs_and_degree_iter(G: nx.Graph, nodes=None) -> iterator
-        Returns an iterator yielding subgraph counts for each node in `G`.
-    
-    count_all_subgraphs(G: nx.Graph, nodes=None) -> dict
-        Counts subgraphs of size 3 with varying edge configurations for specified nodes in `G`.
-    
-    generate_key(G: nx.Graph) -> tuple
-        Generates a key based on subgraph counts, sorted by the number of edges.
-    """
-
     @staticmethod
-    def _subgraphs_and_degree_iter(G, nodes=None):
+    def _subgraphs_and_degree_iter(G: nx.Graph, nodes=None):
         """
         Return an iterator of (node, zero_edges, one_edge, two_edges, triangles) for each node.
 
@@ -148,8 +121,8 @@ class Sub3Generator(KeyGenerator):
 
             yield (v, zero_edges, one_edge, two_edges, triangles)
 
-    @staticmethod
-    def count_all_subgraphs(G: nx.Graph, nodes=None):
+    @classmethod
+    def count_all_subgraphs(cls, G: nx.Graph, nodes=None):
         """
         Count all subgraphs of size 3 with 0, 1, 2, or 3 edges for each node in `G`.
 
@@ -168,17 +141,17 @@ class Sub3Generator(KeyGenerator):
         """
         if nodes is not None:
             if nodes in G:
-                return next(Sub3Generator._subgraphs_and_degree_iter(G, nodes))
-            return {v: (one, two, tri) for v, _, one, two, tri in Sub3Generator._subgraphs_and_degree_iter(G, nodes)}
+                return next(cls._subgraphs_and_degree_iter(G, nodes))
+            return {v: (one, two, tri) for v, _, one, two, tri in cls._subgraphs_and_degree_iter(G, nodes)}
 
         subgraph_counts = Counter(dict.fromkeys(G, (0, 0, 0, 0)))
-        for v, _, one, two, tri in Sub3Generator._subgraphs_and_degree_iter(G):
+        for v, _, one, two, tri in cls._subgraphs_and_degree_iter(G):
             subgraph_counts[v] = (one, two, tri)
 
         return dict(subgraph_counts)
 
     @classmethod
-    def generate_key(cls, G: nx.Graph):
+    def _sub_3_generate_key(cls, G: nx.Graph):
         """
         Generate a unique key for `G` based on sorted subgraph counts of size 3.
 
@@ -197,7 +170,7 @@ class Sub3Generator(KeyGenerator):
             A sorted tuple of subgraph count tuples, where each inner tuple represents the 
             counts for a single node, ordered by the number of triangles, two-edge, and one-edge subgraphs.
         """
-        subgraph_counts = Sub3Generator.count_all_subgraphs(G)
+        subgraph_counts = cls.count_all_subgraphs(G)
 
         sorted_counts = sorted(
             subgraph_counts.items(), 

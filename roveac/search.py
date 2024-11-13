@@ -2,8 +2,8 @@
 Searches
 =============
 
-This module provides the `Search` abstract base class, which defines a method
-for searching within a given Ramsey graph based on specific parameters.
+This module provides the `Search` class, which defines methods for searching within a given 
+Ramsey graph based on specific parameters.
 
 Classes
 -------
@@ -11,7 +11,6 @@ Search : ABC
     Abstract base class for performing searches on Ramsey graphs.
 """
 
-from abc import ABC
 from functools import reduce
 from tqdm import tqdm
 from itertools import islice
@@ -19,23 +18,25 @@ from concurrent.futures import ThreadPoolExecutor
 import threading
 import networkx as nx
 
-class Search(ABC):
+class Search:
     """
     Abstract base class for performing searches within a Ramsey graph.
 
     Methods
     -------
-    search(r_s_t_n: set, s: int, t: int) -> list
+    search(method: str, r_s_t_n: set, s: int, t: int) -> list
         Searches within R(s, t, n) based on given parameters and returns a list of results.
     """
 
     @classmethod
-    def search(cls, r_s_t_n: set, s: int, t: int) -> list:
+    def search(cls, method: str, r_s_t_n: set, s: int, t: int) -> list:
         """
         Perform a search within the graph R(s, t, n) based on the provided parameters.
 
         Parameters
         ----------
+        method: str
+            Denotes which method to use to construct the dictionary.
         r_s_t_n : set
             The set representing the current Ramsey graph R(s, t, n).
         s : int
