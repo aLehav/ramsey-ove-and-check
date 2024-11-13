@@ -20,7 +20,7 @@ class CounterChecker(ABC):
 
     Methods
     -------
-    check(G: nx.Graph, **kwargs) -> bool
+    check(G: nx.Graph, kwargs) -> bool
         Checks if the given graph `G` is a Ramsey counterexample.
     """
 
