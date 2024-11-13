@@ -155,7 +155,6 @@ class SubgraphSTChecker(CounterChecker):
     Methods
     -------
     check(G_n: nx.Graph, G_prime: nx.Graph, D: dict, hash: callable, passed_indices: set, n: int, s: int, t: int) -> bool
-        
         Checks each relevant subgraph in `G_n` to ensure no bad subgraph is present.
     """
 
