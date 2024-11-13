@@ -60,7 +60,7 @@ class TriangleConstructor(DictConstructor):
 
     Methods
     -------
-    construct_dict(R_s_t_n: set, early_stopping=None) -> dict
+    construct_dict(r_s_t_n: set, early_stopping=None) -> dict
         Constructs a dictionary from a set of graphs, grouping subgraphs of size `n-1` by 
         unique keys and storing their neighbor mappings.
     """
@@ -158,7 +158,7 @@ class Sub3Constructor(DictConstructor):
 
     Methods
     -------
-    construct_dict(R_s_t_n: set, early_stopping=None) -> dict
+    construct_dict(r_s_t_n: set, early_stopping=None) -> dict
         Constructs a dictionary from a set of graphs, grouping subgraphs of size `n-1` 
         by unique keys and storing their neighbor mappings.
     """
@@ -167,14 +167,14 @@ class Sub3Constructor(DictConstructor):
         """
         Generate a dictionary of subgraphs hashed by subgraph size 3 counts for isomorphism-based grouping.
 
-        This method iterates over each graph in `R_s_t_n`, removing one node at a time to 
+        This method iterates over each graph in `r_s_t_n`, removing one node at a time to 
         produce subgraphs of size `n-1`. Each subgraph is hashed using the `Sub3Generator` 
         key and is checked for isomorphism with existing entries in the dictionary `D`.
         Neighbor mappings are stored for each unique subgraph to support additional operations.
 
         Parameters
         ----------
-        R_s_t_n : set of nx.Graph
+        r_s_t_n : set of nx.Graph
             Set of graphs to process into subgraphs of size `n-1`, grouped by isomorphism.
         early_stopping : int, optional
             Limits the total number of iterations, halting early if the limit is reached.
@@ -283,7 +283,7 @@ class FlatConstructor(DictConstructor):
 
     Methods
     -------
-    construct_dict(R_s_t_n: set, early_stopping=None) -> dict
+    construct_dict(r_s_t_n: set, early_stopping=None) -> dict
         Constructs a dictionary from a set of graphs, storing unique subgraphs of size `n-1`
         along with their neighbor mappings.
     """
@@ -292,14 +292,14 @@ class FlatConstructor(DictConstructor):
         """
         Generate a dictionary of unique subgraphs based on isomorphism checks.
 
-        For each graph in `R_s_t_n`, this method removes one node at a time to produce 
+        For each graph in `r_s_t_n`, this method removes one node at a time to produce 
         subgraphs of size `n-1`. It then checks if each subgraph is isomorphic to any 
         existing subgraph in `D`. If a new unique subgraph is found, it is added to `D` 
         along with its isomorphic neighbor mappings.
 
         Parameters
         ----------
-        R_s_t_n : set of nx.Graph
+        r_s_t_n : set of nx.Graph
             Set of graphs to process into unique subgraphs of size `n-1`.
         early_stopping : int, optional
             Limits the total number of iterations, halting early if the limit is reached.
@@ -365,7 +365,7 @@ class DoubleKeyConstructor(DictConstructor):
 
     Methods
     -------
-    construct_dict(R_s_t_n: set, early_stopping=None) -> dict
+    construct_dict(r_s_t_n: set, early_stopping=None) -> dict
         Constructs a double-keyed dictionary of unique subgraphs with isomorphic neighbor mappings.
     """
     @classmethod
