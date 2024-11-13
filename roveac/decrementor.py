@@ -2,25 +2,20 @@
 Decrementors
 ==================
 
-This module provides the `Decrementor` abstract base class, which defines a method
-to generate a new Ramsey graph by decrementing a parameter and checking for subgraph isomorphisms.
+This module provides the `Decrementor` class, which defines methods to generate a subset of 
+counterexamples of a size smaller than those given.
 
 Classes
 -------
-Decrementor : ABC
-    Abstract base class for generating a decremented Ramsey graph.
-TriangleDecrementor : Decrementor
-    Decrements with triangle keys.
-FlatDecrementor : Decrementor
-    Decrements without keys and hashing.
+Decrementor 
+    Class for decrementing a set using different strategies.
 """
 
-from abc import ABC
 from tqdm import tqdm
 import networkx as nx
 from roveac.key_generator import TriangleGenerator
 
-class Decrementor(ABC):
+class Decrementor:
     """
     Abstract base class for generating a decremented Ramsey graph by analyzing subgraphs
     and performing isomorphism checking.
@@ -31,13 +26,15 @@ class Decrementor(ABC):
         Generates R(s, t, n-1) by analyzing subgraphs and checking for isomorphisms.
     """
     @classmethod
-    def decrement(cls, r_s_t_n: set, early_stopping=None) -> set:
+    def decrement(cls, method: str, r_s_t_n: set, early_stopping=None) -> set:
         """
         Generate R(s, t, n-1) by intelligently analyzing subgraphs and performing
         isomorphism checks.
 
         Parameters
         ----------
+        method: str
+            Denotes which method to use to decrement
         r_s_t_n : set
             The current set representing R(s, t, n).
         early_stopping : optional
@@ -48,25 +45,14 @@ class Decrementor(ABC):
         set
             A set representing the decremented graph R(s, t, n-1).
         """
-        pass
-
-class TriangleDecrementor(Decrementor):
-    """
-    Performs decrementing operations on sets of graphs for Ramsey theory computations,
-    specifically aimed at reducing graphs by removing nodes to check for specific properties.
-
-    This class extends `Decrementor` to implement a specialized decrementing method that 
-    operates on sets of graphs, utilizing a unique key-based storage mechanism for subgraphs.
-
-    Methods
-    -------
-    decrement(r_s_t_n: set, early_stopping=None) -> dict
-        Decrements each graph in `r_s_t_n` by removing individual nodes, generating subgraphs,
-        and indexing them based on unique keys.
-    """
+        if method == "triangle":
+            return cls._triangle_decrement(r_s_t_n, early_stopping)
+        if method == "flat":
+            return cls._flat_decrement(r_s_t_n, early_stopping)
+        raise ValueError("Unknown method provided for decrementing.")
 
     @classmethod
-    def decrement(cls, r_s_t_n: set, early_stopping=None) -> dict:
+    def _triangle_decrement(cls, r_s_t_n: set, early_stopping=None) -> dict:
         """
         Decrement each graph in `r_s_t_n` by removing nodes and indexing resulting subgraphs.
 
@@ -137,23 +123,8 @@ class TriangleDecrementor(Decrementor):
                 
         return S
 
-class FlatDecrementor(Decrementor):
-    """
-    Generates decremented versions of graphs in a flat structure without indexing, 
-    resulting in a set of unique subgraphs of `R(s, t, n-1)`.
-
-    This class extends `Decrementor` to provide a flat decrementing method that 
-    performs isomorphism checks for each subgraph and stores only unique results.
-
-    Methods
-    -------
-    decrement(r_s_t_n: set, early_stopping=None) -> dict
-        Decrements each graph in `r_s_t_n` by removing individual nodes to create unique
-        subgraphs, returning them as a set.
-    """
-
     @classmethod
-    def decrement(cls, r_s_t_n: set, early_stopping=None) -> dict:
+    def _flat_decrement(cls, r_s_t_n: set, early_stopping=None) -> dict:
         """
         Decrement each graph in `r_s_t_n` by removing nodes and storing unique subgraphs.
 
