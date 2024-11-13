@@ -6,7 +6,7 @@ build-backend = "flit_core.buildapi"
 name = "roveac"
 authors = [{name = "Adam Lehavi", email = "adamlehavi@gmail.com"}]
 dynamic = ["version", "description"]
-readme = "README.rst"
+readme = "PyPI_README.rst"
 dependencies = [
     "networkx >=3.4.2",
     "tqdm >=4.67.0"
