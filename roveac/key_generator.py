@@ -7,12 +7,8 @@ from a graph for use in dictionary generation and hashing.
 
 Classes
 -------
-KeyGenerator : ABC
-    Abstract base class for generating keys from graphs.
-TriangleGenerator : KeyGenerator
-    Generates key for number of triangles through each vertex.
-Sub3Generator : KeyGenerator
-    Generates key for all subgraphs of size 3 through each vertex.
+KeyGenerator
+    Class for generating keys from graphs.
 """
 
 import networkx as nx
