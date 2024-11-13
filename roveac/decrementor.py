@@ -13,7 +13,7 @@ Decrementor
 
 from tqdm import tqdm
 import networkx as nx
-from roveac.key_generator import TriangleGenerator
+from roveac.key_generator import KeyGenerator
 
 class Decrementor:
     """
@@ -91,7 +91,7 @@ class Decrementor:
                 for i in range(n):
                     G_n_minus_one = G_n.copy()
                     G_n_minus_one.remove_node(i)
-                    key = TriangleGenerator.generate_key(G_n_minus_one)
+                    key = KeyGenerator.generate_key(G_n_minus_one, method="triangle")
                     if key in D:
                         found_iso = False
                         for G_star in D[key]:
