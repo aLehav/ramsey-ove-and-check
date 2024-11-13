@@ -5,6 +5,6 @@ API
 .. autosummary::
    :toctree: generated
    :recursive:
+   :members:
 
    roveac
-   roveac.counter_checkers.counter_checker.CounterChecker
