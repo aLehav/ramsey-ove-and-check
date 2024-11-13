@@ -34,7 +34,7 @@ class IsomorphismHasher:
 
         Parameters
         ----------
-        method: str
+        method : str
             Denotes which method to use to hash.
         G : nx.Graph
             The graph to be hashed and checked for isomorphisms.

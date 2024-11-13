@@ -33,7 +33,7 @@ class Decrementor:
 
         Parameters
         ----------
-        method: str
+        method : str
             Denotes which method to use to decrement
         r_s_t_n : set
             The current set representing R(s, t, n).

@@ -63,7 +63,7 @@ class DictConstructor:
 
         Parameters
         ----------
-        method: str
+        method : str
             Denotes which method to use to construct the dictionary.
         r_s_t_n : set
             The current set representing R(s, t, n).
@@ -95,7 +95,7 @@ class DictConstructor:
 
         Parameters
         ----------
-        method: str
+        method : str
             Denotes which method to use to hash.
         r_s_t_n : set of nx.Graph
             Set of graphs to process into subgraphs of size `n-1`, grouped by isomorphism.
