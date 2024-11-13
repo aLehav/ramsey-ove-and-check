@@ -52,21 +52,21 @@ class DictConstructor:
 
     Methods
     -------
-    construct_dict(method: str, r_s_t_n: set, early_stopping: tuple[None, int]) -> dict
+    construct_dict(r_s_t_n: set, method: str, early_stopping: tuple[None, int]) -> dict
         Generates a dictionary with keys in R(s, t, n-1) based on the input graph.
     """
 
     @classmethod
-    def construct_dict(cls, method: str, r_s_t_n: set, early_stopping: tuple[None, int] = None) -> dict:
+    def construct_dict(cls, r_s_t_n: set, method: str = "triangle", early_stopping: tuple[None, int] = None) -> dict:
         """
         Given R(s, t, n), generate a dictionary with keys in R(s, t, n-1).
 
         Parameters
         ----------
-        method : str
-            Denotes which method to use to construct the dictionary.
         r_s_t_n : set
             The current set representing R(s, t, n).
+        method : str
+            Denotes which method to use to construct the dictionary.
         early_stopping : tuple[None, int]
             A parameter for optional early stopping, with an integer or None.
 
