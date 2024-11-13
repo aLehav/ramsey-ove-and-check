@@ -35,8 +35,10 @@ class CounterChecker(ABC):
         ----------
         kwargs : dict
             Keyword arguments containing at least:
+
             - G_prime : nx.Graph
                 The graph to check.
+                
         Returns
         -------
         bool
@@ -115,6 +117,7 @@ class RamseyChecker(CounterChecker):
         ----------
         kwargs : dict
             Keyword arguments containing:
+
             - G_prime : nx.Graph
                 The graph to check.
             - s : int
@@ -166,6 +169,7 @@ class SubgraphSTChecker(CounterChecker):
         ----------
         kwargs : dict
             Keyword arguments containing:
+            
             - G_n : nx.Graph
                 The primary graph to check subgraphs within.
             - G_prime : nx.Graph
