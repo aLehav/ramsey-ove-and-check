@@ -15,7 +15,7 @@ from tqdm import tqdm
 import math
 import networkx as nx
 from itertools import combinations
-from roveac.key_generator import Sub3Generator, TriangleGenerator
+from roveac.key_generator import KeyGenerator
 
 def _add_isomorphic_neighbors(D, G, G_minus_one, i):
     """
@@ -109,12 +109,6 @@ class DictConstructor:
             mapping subgraphs to sets of tuples, representing isomorphic neighbor mappings for 
             each unique subgraph.
         """
-        if method == "triangle":
-            generate_key = TriangleGenerator.generate_key
-        elif method == "sub_3":
-            generate_key = Sub3Generator.generate_key
-        else:
-            raise ValueError("Unknown method value for single key dictionary construction.")
         
         D = {}
 
@@ -133,7 +127,7 @@ class DictConstructor:
                 for i in range(n):
                     G_n_minus_one = G_n.copy()
                     G_n_minus_one.remove_node(i)
-                    key = generate_key(G_n_minus_one)
+                    key = KeyGenerator.generate_key(G_n_minus_one, method=method)
                     if key in D:
                         found_isomorphism = False
                         for G_star in D[key].keys():
@@ -285,10 +279,10 @@ class DictConstructor:
                     edges_across = [(u,v) for u, v in G_n.edges(comb) if v in inv_comb]
                     G_1 = G_n.copy()
                     G_1.remove_nodes_from(inv_comb)
-                    key_1 = TriangleGenerator.generate_key(G_1)
+                    key_1 = KeyGenerator.generate_key(G_1, method="triangle")
                     G_2 = G_n.copy()
                     G_2.remove_nodes_from(comb)
-                    key_2 = TriangleGenerator.generate_key(G_2)
+                    key_2 = KeyGenerator.generate_key(G_2, method="triangle")
                     # These are the graphs used to index, by default G_1 and G_2 but if an isomorphism is found then it becomes that val.
                     G_index_1 = G_1
                     G_index_2 = G_2
