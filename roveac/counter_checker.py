@@ -21,7 +21,7 @@ class CounterChecker:
 
     Methods
     -------
-    check(**kwargs) -> bool
+    check(kwargs) -> bool
         Checks if a given graph is a Ramsey counterexample.
     has_clique_of_size_k(G: nx.Graph, k: int) -> bool
         Checks if the graph `G` has a clique of size `k`.
