@@ -232,8 +232,7 @@ class ImprovedSearch(Search):
 
     Methods
     -------
-    search(r_s_t_n: set, construct_dict, hash, check, generate_key, s: int, t: int, 
-           dict_early_stopping=None, search_early_stopping=None) -> list
+    search(r_s_t_n: set, construct_dict, hash, check, generate_key, s: int, t: int, dict_early_stopping=None, search_early_stopping=None) -> list
         Conducts a parallelized search for counterexamples in `R(s, t, n+1)` using neighbor-based evaluations.
     """
     @classmethod
