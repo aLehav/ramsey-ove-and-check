@@ -14,6 +14,7 @@ CounterChecker
 from itertools import combinations
 from functools import reduce
 import networkx as nx
+from roveac.isomorphism_hasher import IsomorphismHasher
 
 class CounterChecker:
     """
@@ -164,7 +165,7 @@ class CounterChecker:
         G_n = kwargs["G_n"]
         G_prime = kwargs["G_prime"]
         D = kwargs["D"]
-        hasher_func = kwargs["hasher"]
+        hash_method = kwargs["hash_method"]
         passed_indices = kwargs["passed_indices"]
         n = kwargs["n"]
         s = kwargs["s"]
@@ -176,7 +177,7 @@ class CounterChecker:
             if i not in passed_indices:
                 G_n_min_i = G_n.copy()
                 G_n_min_i.remove_node(i)
-                keys, isomorphism = hasher_func(G=G_n_min_i, D=D)
+                keys, isomorphism = IsomorphismHasher.hash(G=G_n_min_i, D=D, method=hash_method)
 
                 v_n_neighbors = set(G_prime.neighbors(n))
                 v_n_neighbors.discard(i)
