@@ -22,21 +22,21 @@ class Decrementor:
 
     Methods
     -------
-    decrement(method: str, r_s_t_n: set, early_stopping=None) -> set
+    decrement(r_s_t_n: set, early_stopping=None, method: str) -> set
         Generates R(s, t, n-1) by analyzing subgraphs and checking for isomorphisms.
     """
     @classmethod
-    def decrement(cls, method: str, r_s_t_n: set, early_stopping=None) -> set:
+    def decrement(cls, r_s_t_n: set, method: str = "triangle", early_stopping=None) -> set:
         """
         Generate R(s, t, n-1) by intelligently analyzing subgraphs and performing
         isomorphism checks.
 
         Parameters
         ----------
-        method : str
-            Denotes which method to use to decrement
         r_s_t_n : set
             The current set representing R(s, t, n).
+        method : str
+            Denotes which method to use to decrement
         early_stopping : optional
             A parameter to allow early termination of the process, if applicable.
 
