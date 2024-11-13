@@ -132,7 +132,7 @@ class CounterChecker:
     def _subgraph_st_check(cls, **kwargs) -> bool:
         """
         Check that each subgraph of `G_n` that excludes indices not in `passed_indices` 
-        passes hash-based tests.
+        passes hasher-based tests.
 
         Parameters
         ----------
@@ -145,7 +145,7 @@ class CounterChecker:
                 A reference graph for neighbor checks.
             - D : dict
                 Dictionary for hashed subgraph lookups.
-            - hash : callable
+            - hasher : callable
                 Hashing function for subgraphs.
             - passed_indices : set
                 Set of node indices that have already been checked.
@@ -159,12 +159,12 @@ class CounterChecker:
         Returns
         -------
         bool
-            True if all necessary subgraphs pass the hash-based checks, False otherwise.
+            True if all necessary subgraphs pass the hasher-based checks, False otherwise.
         """
         G_n = kwargs["G_n"]
         G_prime = kwargs["G_prime"]
         D = kwargs["D"]
-        hash_func = kwargs["hash"]
+        hasher_func = kwargs["hasher"]
         passed_indices = kwargs["passed_indices"]
         n = kwargs["n"]
         s = kwargs["s"]
@@ -176,7 +176,7 @@ class CounterChecker:
             if i not in passed_indices:
                 G_n_min_i = G_n.copy()
                 G_n_min_i.remove_node(i)
-                keys, isomorphism = hash_func(G=G_n_min_i, D=D)
+                keys, isomorphism = hasher_func(G=G_n_min_i, D=D)
 
                 v_n_neighbors = set(G_prime.neighbors(n))
                 v_n_neighbors.discard(i)
