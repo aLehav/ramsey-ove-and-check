@@ -9,6 +9,10 @@ Classes
 -------
 CounterChecker : ABC
     Abstract base class for checking if a candidate graph is a Ramsey counterexample.
+RamseyChecker : CounterChecker
+    Counterexample checker using standard ramsey theory definition.
+SubgraphSTChecker : CounterChecker
+    Counterexample checker using max(s,t) - 1 subgraphs of size n.
 """
 
 from abc import ABC
