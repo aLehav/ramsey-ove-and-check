@@ -2,116 +2,101 @@
 Counter Checkers
 ======================
 
-This module provides the `CounterChecker` abstract base class, which defines a method
-to determine if a graph is a Ramsey counterexample.
+This module provides a consolidated `CounterChecker` class, which defines methods
+to determine if a graph is a Ramsey counterexample using various checking approaches.
 
 Classes
 -------
-CounterChecker : ABC
-    Abstract base class for checking if a candidate graph is a Ramsey counterexample.
-RamseyChecker : CounterChecker
-    Counterexample checker using standard ramsey theory definition.
-SubgraphSTChecker : CounterChecker
-    Counterexample checker using max(s,t) - 1 subgraphs of size n.
+CounterChecker
+    Class for checking if a candidate graph is a Ramsey counterexample using different strategies.
 """
 
-from abc import ABC
 from itertools import combinations
 from functools import reduce
 import networkx as nx
 
-class CounterChecker(ABC):
+class CounterChecker:
     """
-    Abstract base class for checking if a candidate is a Ramsey counterexample.
+    Class for checking if a candidate is a Ramsey counterexample.
 
     Methods
     -------
-    check(kwargs) -> bool
-        Checks if a given graph `G_prime` is a Ramsey counterexample.
+    check(**kwargs) -> bool
+        Checks if a given graph is a Ramsey counterexample.
+    has_clique_of_size_k(G: nx.Graph, k: int) -> bool
+        Checks if the graph `G` has a clique of size `k`.
+    has_independent_set_of_size_k(G: nx.Graph, k: int) -> bool
+        Checks if the graph `G` has an independent set of size `k`.
     """
 
     @classmethod
     def check(cls, **kwargs) -> bool:
         """
-        Check if the given graph `G` is a Ramsey counterexample.
+        Check if the given graph `G` is a Ramsey counterexample using the specified method.
 
         Parameters
         ----------
         kwargs : dict
-            Keyword arguments containing at least:
+            Keyword arguments containing required parameters based on the chosen method.
 
-            - G_prime : nx.Graph
-                The graph to check.
-                
         Returns
         -------
         bool
             True if the graph is a counterexample, False otherwise.
         """
+        method = kwargs.get("method")
+        if method == "ramsey":
+            return cls._ramsey_check(**kwargs)
+        if method == "subgraph_st":
+            return cls._subgraph_st_check(**kwargs)
+        raise ValueError("Unknown method provided for checking.")
 
-def has_clique_of_size_k(G: nx.Graph, k: int) -> bool:
-    """
-    Check if the graph `G` has a clique of size `k`.
+    @staticmethod
+    def has_clique_of_size_k(G: nx.Graph, k: int) -> bool:
+        """
+        Check if the graph `G` has a clique of size `k`.
 
-    Parameters
-    ----------
-    G : nx.Graph
-        The graph to check for the presence of a clique.
-    k : int
-        The size of the clique to search for.
+        Parameters
+        ----------
+        G : nx.Graph
+            The graph to check for the presence of a clique.
+        k : int
+            The size of the clique to search for.
 
-    Returns
-    -------
-    bool
-        True if the graph has a clique of the specified size, False otherwise.
-    """
-    for nodes in combinations(G.nodes, k):
-        if G.subgraph(nodes).number_of_edges() == k * (k - 1) // 2:
-            return True
-    return False
+        Returns
+        -------
+        bool
+            True if the graph has a clique of the specified size, False otherwise.
+        """
+        for nodes in combinations(G.nodes, k):
+            if G.subgraph(nodes).number_of_edges() == k * (k - 1) // 2:
+                return True
+        return False
 
-def has_independent_set_of_size_k(G: nx.Graph, k: int) -> bool:
-    """
-    Check if the graph `G` has an independent set of size `k`.
+    @staticmethod
+    def has_independent_set_of_size_k(G: nx.Graph, k: int) -> bool:
+        """
+        Check if the graph `G` has an independent set of size `k`.
 
-    Parameters
-    ----------
-    G : nx.Graph
-        The graph to check for an independent set.
-    k : int
-        The size of the independent set to search for.
+        Parameters
+        ----------
+        G : nx.Graph
+            The graph to check for an independent set.
+        k : int
+            The size of the independent set to search for.
 
-    Returns
-    -------
-    bool
-        True if the graph has an independent set of the specified size, False otherwise.
-    """
-    for nodes in combinations(G.nodes, k):
-        if G.subgraph(nodes).number_of_edges() == 0:
-            return True
-    return False
-
-class RamseyChecker(CounterChecker):
-    """
-    Checker for Ramsey theory counterexamples using clique and independent set tests.
-
-    This class provides a method for checking if a given graph lacks both a clique
-    of size `s` and an independent set of size `t`, which is a condition for it being
-    a Ramsey counterexample.
-
-    Runtime
-    -------
-    *O(n^max(s,t))*
-
-    Methods
-    -------
-    check(G_prime: nx.Graph, s: int, t: int) -> bool
-        Checks if the graph `G_prime` lacks both a clique of size `s` and an independent
-        set of size `t`.
-    """
+        Returns
+        -------
+        bool
+            True if the graph has an independent set of the specified size, False otherwise.
+        """
+        for nodes in combinations(G.nodes, k):
+            if G.subgraph(nodes).number_of_edges() == 0:
+                return True
+        return False
 
     @classmethod
-    def check(cls, **kwargs) -> bool:
+    def _ramsey_check(cls, **kwargs) -> bool:
         """
         Check if the given graph `G_prime` lacks both a clique of size `s` and 
         an independent set of size `t`.
@@ -137,32 +122,14 @@ class RamseyChecker(CounterChecker):
         G_prime = kwargs["G_prime"]
         s = kwargs["s"]
         t = kwargs["t"]
-        if has_clique_of_size_k(G_prime, s):
+        if cls.has_clique_of_size_k(G_prime, s):
             return False
-        if has_independent_set_of_size_k(G_prime, t):
+        if cls.has_independent_set_of_size_k(G_prime, t):
             return False
         return True
 
-class SubgraphSTChecker(CounterChecker):
-    """
-    Checker for subgraph conditions in Ramsey counterexamples using hashing and s-t optimization.
-
-    This class verifies that for every subgraph missing an index (excluding the `passed_indices`
-    in `G`), no bad subgraphs exist by using a hash map lookup to reduce computation 
-    time. The checks ensure that the largest unchecked group is of size `max(s, t) + 1`.
-
-    Runtime
-    -------
-    *O((max{s, t} - 1)HASH)*
-
-    Methods
-    -------
-    check(G_n: nx.Graph, G_prime: nx.Graph, D: dict, hash: callable, passed_indices: set, n: int, s: int, t: int) -> bool
-        Checks each relevant subgraph in `G_n` to ensure no bad subgraph is present.
-    """
-
     @classmethod
-    def check(cls, **kwargs) -> bool:
+    def _subgraph_st_check(cls, **kwargs) -> bool:
         """
         Check that each subgraph of `G_n` that excludes indices not in `passed_indices` 
         passes hash-based tests.
@@ -197,7 +164,7 @@ class SubgraphSTChecker(CounterChecker):
         G_n = kwargs["G_n"]
         G_prime = kwargs["G_prime"]
         D = kwargs["D"]
-        hash = kwargs["hash"]
+        hash_func = kwargs["hash"]
         passed_indices = kwargs["passed_indices"]
         n = kwargs["n"]
         s = kwargs["s"]
@@ -209,7 +176,7 @@ class SubgraphSTChecker(CounterChecker):
             if i not in passed_indices:
                 G_n_min_i = G_n.copy()
                 G_n_min_i.remove_node(i)
-                keys, isomorphism = hash(G=G_n_min_i, D=D)
+                keys, isomorphism = hash_func(G=G_n_min_i, D=D)
 
                 v_n_neighbors = set(G_prime.neighbors(n))
                 v_n_neighbors.discard(i)
