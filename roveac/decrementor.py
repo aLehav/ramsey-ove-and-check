@@ -1,5 +1,5 @@
 """
-decrementor module
+Decrementors
 ==================
 
 This module provides the `Decrementor` abstract base class, which defines a method

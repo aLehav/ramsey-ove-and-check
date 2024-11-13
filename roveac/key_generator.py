@@ -1,5 +1,5 @@
 """
-key_generator module
+Key Generators
 ====================
 
 This module provides the `KeyGenerator` abstract base class, which defines a method
@@ -45,7 +45,6 @@ class KeyGenerator(ABC):
         key
             A unique identifier generated from the graph.
         """
-        pass
 
 class TriangleGenerator(KeyGenerator):
     """

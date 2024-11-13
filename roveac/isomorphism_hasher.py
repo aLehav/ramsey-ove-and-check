@@ -1,5 +1,5 @@
 """
-isomorphism_hasher module
+Isomorphism Hashers
 =========================
 
 This module provides the `IsomorphismHasher` abstract base class, which defines a method

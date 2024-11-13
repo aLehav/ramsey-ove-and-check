@@ -1,5 +1,5 @@
 """
-search module
+Searches
 =============
 
 This module provides the `Search` abstract base class, which defines a method

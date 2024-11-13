@@ -1,5 +1,5 @@
 """
-counter_checker module
+Counter Checkers
 ======================
 
 This module provides the `CounterChecker` abstract base class, which defines a method
@@ -48,7 +48,6 @@ class CounterChecker(ABC):
         bool
             True if the graph is a counterexample, False otherwise.
         """
-        pass
 
 def has_clique_of_size_k(G: nx.Graph, k: int) -> bool:
     """
