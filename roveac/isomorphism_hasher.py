@@ -2,22 +2,21 @@
 Isomorphism Hashers
 =========================
 
-This module provides the `IsomorphismHasher` abstract base class, which defines a method
+This module provides the `IsomorphismHasher` class, which defines a method
 for hashing a graph to check for isomorphisms among known keys in a dictionary.
 
 Classes
 -------
-IsomorphismHasher : ABC
-    Abstract base class for hashing graphs and checking for isomorphisms.
+IsomorphismHasher
+    Class for hashing graphs and checking for isomorphisms.
 """
 
-from abc import ABC
 import networkx as nx
 from roveac.key_generator import TriangleGenerator, Sub3Generator
 
-class IsomorphismHasher(ABC):
+class IsomorphismHasher:
     """
-    Abstract base class for hashing graphs and retrieving matching isomorphic keys.
+    Class for hashing graphs and retrieving matching isomorphic keys.
 
     Methods
     -------
@@ -26,7 +25,7 @@ class IsomorphismHasher(ABC):
     """
 
     @classmethod
-    def hash(cls, G: nx.Graph, D: dict) -> tuple[list, dict]:
+    def hash(cls, method: str, G: nx.Graph, D: dict) -> tuple[list, dict]:
         """
         Takes in a graph known to be among the keys of `D` and hashes it, returning
         a matching list of isomorphic keys and the corresponding isomorphism data.
@@ -35,6 +34,8 @@ class IsomorphismHasher(ABC):
 
         Parameters
         ----------
+        method: str
+            Denotes which method to use to hash.
         G : nx.Graph
             The graph to be hashed and checked for isomorphisms.
         D : dict
@@ -48,22 +49,16 @@ class IsomorphismHasher(ABC):
             - A list of keys in `D` that are isomorphic to `G`.
             - A dictionary representing the isomorphism data for the matches.
         """
-
-class TriangleHasher(IsomorphismHasher):
-    """
-    Hashes a graph based on triangle counts at each node to facilitate isomorphism checks.
-
-    This class extends `IsomorphismHasher` to use triangle-based hashing for efficient 
-    isomorphism checks within a dictionary of pre-hashed graphs. Primarily used when 
-    triangle counts are sufficient to distinguish graphs in `D`.
-
-    Methods
-    -------
-    hash(G: nx.Graph, D: dict) -> tuple[list, dict]
-        Hashes the graph based on triangle counts and finds an isomorphic graph in `D`.
-    """
+        if method == "triangle":
+            return cls._triangle_hash(G, D)
+        if method == "sub_3":
+            return cls._sub_3_hash(G, D)
+        if method == "vf2pp_iter":
+            return cls._vf2pp_iter_hash(G, D)
+        raise ValueError("Unknown method provided for hashing.")
+    
     @classmethod
-    def hash(cls, G: nx.Graph, D: dict) -> tuple[list, dict]:
+    def _triangle_hash(cls, G: nx.Graph, D: dict) -> tuple[list, dict]:
         """
         Hash the graph `G` by its triangle count and locate an isomorphic graph in `D`.
 
@@ -92,20 +87,8 @@ class TriangleHasher(IsomorphismHasher):
 
         raise RuntimeError("No isomorphism found.")
     
-class Sub3Hasher(IsomorphismHasher):
-    """
-    Hashes a graph by subgraph counts of size 3 for efficient isomorphism checks.
-
-    Extends `IsomorphismHasher` to use subgraph size 3 counts for hashing, suitable 
-    for cases where subgraph patterns help distinguish graph structures in `D`.
-
-    Methods
-    -------
-    hash(G: nx.Graph, D: dict) -> tuple[list, dict]
-        Hashes the graph based on subgraph size 3 counts and finds an isomorphic graph in `D`.
-    """
     @classmethod
-    def hash(cls, G: nx.Graph, D: dict) -> tuple[list, dict]:
+    def _sub_3_hash(cls, G: nx.Graph, D: dict) -> tuple[list, dict]:
         """
         Hash the graph `G` by its subgraph size 3 counts and locate an isomorphic graph in `D`.
 
@@ -134,21 +117,8 @@ class Sub3Hasher(IsomorphismHasher):
 
         raise RuntimeError("No isomorphism found.")
     
-class VF2PPIterHasher(IsomorphismHasher):
-    """
-    Performs naive hashing by iterating over `D` and applying VF2++ isomorphism checks.
-
-    This class extends `IsomorphismHasher` to identify an isomorphic graph from a set of 
-    candidates by directly iterating over all entries in `D`. Designed for cases where 
-    an exact match is known to exist but requires explicit verification.
-
-    Methods
-    -------
-    hash(G: nx.Graph, D: dict) -> tuple[list, dict]
-        Iterates through `D` to find the graph isomorphic to `G`.
-    """
     @classmethod
-    def hash(cls, G: nx.Graph, D: dict) -> tuple[list, dict]:
+    def _vf2pp_iter_hash(cls, G: nx.Graph, D: dict) -> tuple[list, dict]:
         """
         Locate the graph in `D` that is isomorphic to `G`.
 
