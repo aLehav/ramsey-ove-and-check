@@ -12,7 +12,7 @@ IsomorphismHasher
 """
 
 import networkx as nx
-from roveac.key_generator import TriangleGenerator, Sub3Generator
+from roveac.key_generator import KeyGenerator
 
 class IsomorphismHasher:
     """
@@ -79,7 +79,7 @@ class IsomorphismHasher:
         RuntimeError
             If no isomorphic graph is found in `D`.
         """
-        key = TriangleGenerator.generate_key(G)
+        key = KeyGenerator.generate_key(G, method="triangle")
         for G_star in D[key].keys():
             isomorphim = nx.isomorphism.vf2pp_isomorphism(G, G_star)
             if isomorphim is not None:
@@ -109,7 +109,7 @@ class IsomorphismHasher:
         RuntimeError
             If no isomorphic graph is found in `D`.
         """
-        key = Sub3Generator.generate_key(G)
+        key = KeyGenerator.generate_key(G, method="sub_3")
         for G_star in D[key].keys():
             isomorphim = nx.isomorphism.vf2pp_isomorphism(G, G_star)
             if isomorphim is not None:
