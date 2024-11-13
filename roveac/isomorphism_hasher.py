@@ -20,12 +20,12 @@ class IsomorphismHasher:
 
     Methods
     -------
-    hash(G: nx.Graph, D: dict) -> tuple[list, dict]
+    hash(G: nx.Graph, D: dict, method: str) -> tuple[list, dict]
         Hashes the given graph and returns a list of matching isomorphic keys from the dictionary.
     """
 
     @classmethod
-    def hash(cls, method: str, G: nx.Graph, D: dict) -> tuple[list, dict]:
+    def hash(cls, G: nx.Graph, D: dict, method: str = "triangle") -> tuple[list, dict]:
         """
         Takes in a graph known to be among the keys of `D` and hashes it, returning
         a matching list of isomorphic keys and the corresponding isomorphism data.
@@ -34,12 +34,12 @@ class IsomorphismHasher:
 
         Parameters
         ----------
-        method : str
-            Denotes which method to use to hash.
         G : nx.Graph
             The graph to be hashed and checked for isomorphisms.
         D : dict
             A dictionary where keys are graph representations to check for isomorphism with `G`.
+        method : str
+            Denotes which method to use to hash.
 
         Returns
         -------
