@@ -7,19 +7,19 @@ This package includes modules for counterexample checking and Ramsey graph analy
 __version__ = "0.0.1"
 
 # From counter_checkers
-from .counter_checkers.counter_checker import CounterChecker  # adjust with the actual class or function names
+from .counter_checker import CounterChecker  # adjust with the actual class or function names
 
 # From decrementors
-from .decrementors.decrementor import Decrementor
+from .decrementor import Decrementor
 
 # From dict_constructors
-from .dict_constructors.dict_constructor import DictConstructor
+from .dict_constructor import DictConstructor
 
 # From isomorphism_hashers
-from .isomorphism_hashers.isomorphism_hasher import IsomorphismHasher
+from .isomorphism_hasher import IsomorphismHasher
 
 # From key_generators
-from .key_generators.key_generator import KeyGenerator
+from .key_generator import KeyGenerator
 
 # From searches
-from .searches.search import Search
+from .search import Search
