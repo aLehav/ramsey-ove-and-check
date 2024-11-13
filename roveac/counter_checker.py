@@ -150,12 +150,13 @@ class SubgraphSTChecker(CounterChecker):
 
     Runtime
     -------
-    *O((max{s, t} - 1)HASH)*, with potential for s-t speedup.
+    *O((max{s, t} - 1)HASH)*
 
     Methods
     -------
     check(G_n: nx.Graph, G_prime: nx.Graph, D: dict, hash: callable, 
-    passed_indices: set, n: int, s: int, t: int) -> bool
+        passed_indices: set, n: int, s: int, t: int) -> bool
+        
         Checks each relevant subgraph in `G_n` to ensure no bad subgraph is present.
     """
 
@@ -169,7 +170,7 @@ class SubgraphSTChecker(CounterChecker):
         ----------
         kwargs : dict
             Keyword arguments containing:
-            
+
             - G_n : nx.Graph
                 The primary graph to check subgraphs within.
             - G_prime : nx.Graph
