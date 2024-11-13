@@ -2,25 +2,53 @@
 Dictionary Constructors
 =======================
 
-This module provides the `DictConstructor` abstract base class, which defines a method
-for generating a dictionary with keys in a decremented Ramsey graph.
+This module provides the `DictConstructor` class, which defines method for generating a dictionary
+with keys in a decremented Ramsey graph.
 
 Classes
 -------
-DictConstructor : ABC
-    Abstract base class for constructing a dictionary from a given Ramsey graph.
+DictConstructor
+    Class for constructing a dictionary from a given counterexample set.
 """
 
-from abc import ABC
 from tqdm import tqdm
 import math
 import networkx as nx
 from itertools import combinations
 from roveac.key_generator import Sub3Generator, TriangleGenerator
 
-class DictConstructor(ABC):
+def _add_isomorphic_neighbors(D, G, G_minus_one, i):
     """
-    Abstract base class for constructing a dictionary with keys in a decremented Ramsey graph.
+    Add isomorphic neighbor mappings to the dictionary for a given subgraph.
+
+    This helper function performs isomorphism checks between a subgraph `G_minus_one` 
+    and itself to ensure consistency in stored mappings. It then stores the 
+    neighbors of `G` that are isomorphic to the nodes in `G_minus_one`, enabling 
+    future subgraph retrieval based on neighbor mappings.
+
+    Parameters
+    ----------
+    D : dict
+        Dictionary storing subgraphs and their associated isomorphic neighbor mappings.
+    G : nx.Graph
+        The original graph containing `G_minus_one` as a subgraph.
+    G_minus_one : nx.Graph
+        The subgraph of `G` formed by removing one node.
+    i : int
+        The node index removed from `G` to form `G_minus_one`.
+    """
+    isomorphisms = list(nx.isomorphism.vf2pp_all_isomorphisms(G_minus_one, G_minus_one))
+    neighbors = set(G.neighbors(i))
+    for isomorphism in isomorphisms:
+        isomorphic_neighbors = tuple(sorted((isomorphism[neighbor] for neighbor in neighbors), reverse=True))
+        if G_minus_one in D:
+            D[G_minus_one].add(isomorphic_neighbors)
+        else:
+            D[G_minus_one] = set([isomorphic_neighbors])
+
+class DictConstructor:
+    """
+    Class for constructing a dictionary with keys in a decremented Ramsey graph.
 
     Methods
     -------
@@ -29,12 +57,14 @@ class DictConstructor(ABC):
     """
 
     @classmethod
-    def construct_dict(cls, r_s_t_n: set, early_stopping: tuple[None, int]) -> dict:
+    def construct_dict(cls, method: str, r_s_t_n: set, early_stopping: tuple[None, int] = None) -> dict:
         """
         Given R(s, t, n), generate a dictionary with keys in R(s, t, n-1).
 
         Parameters
         ----------
+        method: str
+            Denotes which method to use to construct the dictionary.
         r_s_t_n : set
             The current set representing R(s, t, n).
         early_stopping : tuple[None, int]
@@ -44,39 +74,29 @@ class DictConstructor(ABC):
         -------
         dict
             A dictionary with keys in the decremented Ramsey graph R(s, t, n-1).
-
-        TODO
-        ----
-        Add corresponding graph counters to decrement.
         """
-
-class TriangleConstructor(DictConstructor):
-    """
-    Constructs a dictionary of subgraphs, hashed by counts of subgraphs of size 3.
-
-    This class extends `DictConstructor` to generate a dictionary of sets, where each key 
-    is derived from the triangle-based subgraph count hash. It stores unique subgraphs 
-    with isomorphic neighbor mappings to facilitate further graph-based operations.
-
-    Methods
-    -------
-    construct_dict(r_s_t_n: set, early_stopping=None) -> dict
-        Constructs a dictionary from a set of graphs, grouping subgraphs of size `n-1` by 
-        unique keys and storing their neighbor mappings.
-    """
+        if method in ["triangle","sub_3"]:
+            return cls._single_key_construct_dict(method, r_s_t_n, early_stopping)
+        if method == "flat":
+            return cls._flat_construct_dict(r_s_t_n, early_stopping)
+        if method == "double_key":
+            return cls._double_key_construct_dict(r_s_t_n, early_stopping)
+        raise ValueError("Unknown method provided for constructing")
 
     @classmethod
-    def construct_dict(cls, r_s_t_n: set, early_stopping=None) -> dict:
+    def _single_key_construct_dict(cls, method: str, r_s_t_n: set, early_stopping=None) -> dict:
         """
-        Generate a dictionary of subgraphs hashed by triangle counts for isomorphism-based grouping.
+        Generate a dictionary of subgraphs hashed by a single key for isomorphism-based grouping.
 
         This method iterates over each graph in `r_s_t_n`, removing one node at a time to 
-        produce subgraphs of size `n-1`. Each subgraph is hashed using the `TriangleGenerator` 
-        key and is checked for isomorphism with existing entries in the dictionary `D`.
-        Neighbor mappings are stored for each unique subgraph to support additional operations.
+        produce subgraphs of size `n-1`. Each subgraph is hashed using the `TriangleGenerator` or
+        `Sub3Generator` key and is checked for isomorphism with existing entries in the dictionary 
+        `D`. Neighbor mappings are stored for each unique subgraph to support additional operations.
 
         Parameters
         ----------
+        method: str
+            Denotes which method to use to hash.
         r_s_t_n : set of nx.Graph
             Set of graphs to process into subgraphs of size `n-1`, grouped by isomorphism.
         early_stopping : int, optional
@@ -89,6 +109,13 @@ class TriangleConstructor(DictConstructor):
             mapping subgraphs to sets of tuples, representing isomorphic neighbor mappings for 
             each unique subgraph.
         """
+        if method == "triangle":
+            generate_key = TriangleGenerator.generate_key
+        elif method == "sub_3":
+            generate_key = Sub3Generator.generate_key
+        else:
+            raise ValueError("Unknown method value for single key dictionary construction.")
+        
         D = {}
 
         # Get n
@@ -106,7 +133,7 @@ class TriangleConstructor(DictConstructor):
                 for i in range(n):
                     G_n_minus_one = G_n.copy()
                     G_n_minus_one.remove_node(i)
-                    key = TriangleGenerator.generate_key(G_n_minus_one)
+                    key = generate_key(G_n_minus_one)
                     if key in D:
                         found_isomorphism = False
                         for G_star in D[key].keys():
@@ -146,149 +173,9 @@ class TriangleConstructor(DictConstructor):
                     break
                 pbar.set_postfix(graph=f"{idx}/{total_graphs}")
         return D
-    
 
-class Sub3Constructor(DictConstructor):
-    """
-    Constructs a dictionary of subgraphs, hashed by counts of subgraphs of size 3.
-
-    This class extends `DictConstructor` to generate a dictionary of sets, where each key 
-    is derived from the hash of subgraphs of size 3. It stores unique subgraphs with 
-    isomorphic neighbor mappings to support further graph-based operations.
-
-    Methods
-    -------
-    construct_dict(r_s_t_n: set, early_stopping=None) -> dict
-        Constructs a dictionary from a set of graphs, grouping subgraphs of size `n-1` 
-        by unique keys and storing their neighbor mappings.
-    """
     @classmethod
-    def construct_dict(cls, r_s_t_n: set, early_stopping=None) -> dict:
-        """
-        Generate a dictionary of subgraphs hashed by subgraph size 3 counts for isomorphism-based grouping.
-
-        This method iterates over each graph in `r_s_t_n`, removing one node at a time to 
-        produce subgraphs of size `n-1`. Each subgraph is hashed using the `Sub3Generator` 
-        key and is checked for isomorphism with existing entries in the dictionary `D`.
-        Neighbor mappings are stored for each unique subgraph to support additional operations.
-
-        Parameters
-        ----------
-        r_s_t_n : set of nx.Graph
-            Set of graphs to process into subgraphs of size `n-1`, grouped by isomorphism.
-        early_stopping : int, optional
-            Limits the total number of iterations, halting early if the limit is reached.
-
-        Returns
-        -------
-        dict
-            A dictionary where keys are subgraph size 3-based hashes, and values are dictionaries 
-            mapping subgraphs to sets of tuples, representing isomorphic neighbor mappings for 
-            each unique subgraph.
-        """
-        D = {}
-
-        # Get n
-        for G_n in r_s_t_n:
-            n = G_n.order()
-            break
-        
-        total_graphs = len(r_s_t_n)
-        total_combinations = n*total_graphs
-
-        with tqdm(total=total_combinations, desc="Constructing dict") as pbar:
-            pbar.set_postfix(graph=f"0/{total_graphs}")
-            iterations = 0
-            for idx, G_n in enumerate(r_s_t_n, start=1):
-                for i in range(n):
-                    G_n_minus_one = G_n.copy()
-                    G_n_minus_one.remove_node(i)
-                    key = Sub3Generator.generate_key(G_n_minus_one)
-                    if key in D:
-                        found_isomorphism = False
-                        for G_star in D[key].keys():
-                            isomorphisms = list(nx.isomorphism.vf2pp_all_isomorphisms(G_n_minus_one, G_star))
-                            if isomorphisms:
-                                neighbors = set(G_n.neighbors(i))
-                                for isomorphism in isomorphisms:                                                
-                                    isomorphic_neighbors = tuple(sorted((isomorphism[neighbor] for neighbor in neighbors), reverse=True))
-                                    D[key][G_star].add(isomorphic_neighbors)
-                                found_isomorphism = True
-                                break
-                        if not found_isomorphism:
-                            isomorphisms = list(nx.isomorphism.vf2pp_all_isomorphisms(G_n_minus_one, G_n_minus_one))
-                            neighbors = set(G_n.neighbors(i))
-                            for isomorphism in isomorphisms:           
-                                isomorphic_neighbors = tuple(sorted((isomorphism[neighbor] for neighbor in neighbors), reverse=True))
-                                if G_n_minus_one in D:
-                                    D[key][G_n_minus_one].add(isomorphic_neighbors)
-                                else:
-                                    D[key][G_n_minus_one] = set([isomorphic_neighbors])
-                    else:
-                        isomorphisms = list(nx.isomorphism.vf2pp_all_isomorphisms(G_n_minus_one, G_n_minus_one))
-                        neighbors = set(G_n.neighbors(i))
-                        D[key] = {}
-                        for isomorphism in isomorphisms:           
-                            isomorphic_neighbors = tuple(sorted((isomorphism[neighbor] for neighbor in neighbors), reverse=True))
-                            if G_n_minus_one in D[key]:
-                                D[key][G_n_minus_one].add(isomorphic_neighbors)
-                            else:
-                                D[key][G_n_minus_one] = set([isomorphic_neighbors])
-                    pbar.update(1)
-                    iterations += 1
-                    if (early_stopping is not None) and (iterations >= early_stopping):
-                        break
-
-                if (early_stopping is not None) and (iterations >= early_stopping):
-                    break
-                pbar.set_postfix(graph=f"{idx}/{total_graphs}")
-        return D
-    
-def _add_isomorphic_neighbors(D, G, G_minus_one, i):
-    """
-    Add isomorphic neighbor mappings to the dictionary for a given subgraph.
-
-    This helper function performs isomorphism checks between a subgraph `G_minus_one` 
-    and itself to ensure consistency in stored mappings. It then stores the 
-    neighbors of `G` that are isomorphic to the nodes in `G_minus_one`, enabling 
-    future subgraph retrieval based on neighbor mappings.
-
-    Parameters
-    ----------
-    D : dict
-        Dictionary storing subgraphs and their associated isomorphic neighbor mappings.
-    G : nx.Graph
-        The original graph containing `G_minus_one` as a subgraph.
-    G_minus_one : nx.Graph
-        The subgraph of `G` formed by removing one node.
-    i : int
-        The node index removed from `G` to form `G_minus_one`.
-    """
-    isomorphisms = list(nx.isomorphism.vf2pp_all_isomorphisms(G_minus_one, G_minus_one))
-    neighbors = set(G.neighbors(i))
-    for isomorphism in isomorphisms:
-        isomorphic_neighbors = tuple(sorted((isomorphism[neighbor] for neighbor in neighbors), reverse=True))
-        if G_minus_one in D:
-            D[G_minus_one].add(isomorphic_neighbors)
-        else:
-            D[G_minus_one] = set([isomorphic_neighbors])
-
-class FlatConstructor(DictConstructor):
-    """
-    Constructs a dictionary of unique subgraphs in a flat structure with isomorphism checks.
-
-    This class extends `DictConstructor` to produce a dictionary of subgraphs where each 
-    unique subgraph is stored along with its neighbor mappings, allowing retrieval 
-    based on isomorphic structures.
-
-    Methods
-    -------
-    construct_dict(r_s_t_n: set, early_stopping=None) -> dict
-        Constructs a dictionary from a set of graphs, storing unique subgraphs of size `n-1`
-        along with their neighbor mappings.
-    """
-    @classmethod
-    def construct_dict(cls, r_s_t_n: set, early_stopping=None) -> dict:
+    def _flat_construct_dict(cls, r_s_t_n: set, early_stopping=None) -> dict:
         """
         Generate a dictionary of unique subgraphs based on isomorphism checks.
 
@@ -352,24 +239,8 @@ class FlatConstructor(DictConstructor):
                 pbar.set_postfix(graph=f"{idx}/{total_graphs}")
         return D
     
-class DoubleKeyConstructor(DictConstructor):
-    """
-    Constructs a dictionary of subgraphs with double-key hashing based on subgraph 
-    size 3 counts for efficient isomorphism checking.
-
-    This class extends `DictConstructor` to facilitate the organization of subgraphs 
-    using a double-key approach. Each subgraph is hashed by a primary key derived from 
-    triangle-based subgraph counts and a secondary key generated from isomorphic mappings 
-    of node pairs, optimizing storage and retrieval of unique subgraphs across graph 
-    combinations.
-
-    Methods
-    -------
-    construct_dict(r_s_t_n: set, early_stopping=None) -> dict
-        Constructs a double-keyed dictionary of unique subgraphs with isomorphic neighbor mappings.
-    """
     @classmethod
-    def construct_dict(cls, r_s_t_n: set, early_stopping=None) -> dict:
+    def _double_key_construct_dict(cls, r_s_t_n: set, early_stopping=None) -> dict:
         """
         Generates a dictionary with nested hash keys for efficient subgraph isomorphism checks.
 
