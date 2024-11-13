@@ -22,20 +22,20 @@ class KeyGenerator:
 
     Methods
     -------
-    generate_key(method: str, G: nx.Graph)
+    generate_key(G: nx.Graph, method: str)
         Produces a key based on the given graph.
     """
     @classmethod
-    def generate_key(cls, method: str, G: nx.Graph):
+    def generate_key(cls, G: nx.Graph, method: str):
         """
         Generate a unique key for the provided graph `G`.
 
         Parameters
         ----------
-        method : str
-            Denotes which method to use to construct the dictionary.
         G : nx.Graph
             The graph from which to generate the key.
+        method : str
+            Denotes which method to use to construct the dictionary.
 
         Returns
         -------
