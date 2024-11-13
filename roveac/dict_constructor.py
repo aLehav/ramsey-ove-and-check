@@ -52,7 +52,7 @@ class DictConstructor:
 
     Methods
     -------
-    construct_dict(r_s_t_n: set, early_stopping: tuple[None, int]) -> dict
+    construct_dict(method: str, r_s_t_n: set, early_stopping: tuple[None, int]) -> dict
         Generates a dictionary with keys in R(s, t, n-1) based on the input graph.
     """
 

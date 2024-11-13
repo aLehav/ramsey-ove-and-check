@@ -22,7 +22,7 @@ class Decrementor:
 
     Methods
     -------
-    decrement(r_s_t_n: set, early_stopping=None) -> set
+    decrement(method: str, r_s_t_n: set, early_stopping=None) -> set
         Generates R(s, t, n-1) by analyzing subgraphs and checking for isomorphisms.
     """
     @classmethod
