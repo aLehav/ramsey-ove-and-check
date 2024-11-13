@@ -27,18 +27,18 @@ class Decrementor(ABC):
 
     Methods
     -------
-    decrement(R_s_t_n: set, early_stopping=None) -> set
+    decrement(r_s_t_n: set, early_stopping=None) -> set
         Generates R(s, t, n-1) by analyzing subgraphs and checking for isomorphisms.
     """
     @classmethod
-    def decrement(cls, R_s_t_n: set, early_stopping=None) -> set:
+    def decrement(cls, r_s_t_n: set, early_stopping=None) -> set:
         """
         Generate R(s, t, n-1) by intelligently analyzing subgraphs and performing
         isomorphism checks.
 
         Parameters
         ----------
-        R_s_t_n : set
+        r_s_t_n : set
             The current set representing R(s, t, n).
         early_stopping : optional
             A parameter to allow early termination of the process, if applicable.
@@ -60,24 +60,24 @@ class TriangleDecrementor(Decrementor):
 
     Methods
     -------
-    decrement(R_s_t_n: set, early_stopping=None) -> dict
-        Decrements each graph in `R_s_t_n` by removing individual nodes, generating subgraphs,
+    decrement(r_s_t_n: set, early_stopping=None) -> dict
+        Decrements each graph in `r_s_t_n` by removing individual nodes, generating subgraphs,
         and indexing them based on unique keys.
     """
 
     @classmethod
-    def decrement(cls, R_s_t_n: set, early_stopping=None) -> dict:
+    def decrement(cls, r_s_t_n: set, early_stopping=None) -> dict:
         """
-        Decrement each graph in `R_s_t_n` by removing nodes and indexing resulting subgraphs.
+        Decrement each graph in `r_s_t_n` by removing nodes and indexing resulting subgraphs.
 
-        For each graph in `R_s_t_n`, iteratively removes nodes to create subgraphs, which 
+        For each graph in `r_s_t_n`, iteratively removes nodes to create subgraphs, which 
         are stored in a dictionary `D` keyed by a unique identifier. If a subgraph is already 
         present in `D`, isomorphism checks are performed to ensure unique storage of isomorphic 
         subgraphs. The function halts early if the `early_stopping` limit is reached.
 
         Parameters
         ----------
-        R_s_t_n : set of nx.Graph
+        r_s_t_n : set of nx.Graph
             Set of graphs on which decrementing operations are performed.
         early_stopping : int, optional
             Limits the total number of decrementing iterations, halting early if reached.
@@ -91,17 +91,17 @@ class TriangleDecrementor(Decrementor):
         D = {}
 
         # Get n
-        for G_n in R_s_t_n:
+        for G_n in r_s_t_n:
             n = G_n.order()
             break
 
-        total_graphs = len(R_s_t_n)
+        total_graphs = len(r_s_t_n)
         total_combinations = n * total_graphs
 
         with tqdm(total=total_combinations, desc="Decrementing combinations") as pbar:
             pbar.set_postfix(graph=f"0/{total_graphs}")
             iterations = 0
-            for idx, G_n in enumerate(R_s_t_n, start=1):
+            for idx, G_n in enumerate(r_s_t_n, start=1):
                 for i in range(n):
                     G_n_minus_one = G_n.copy()
                     G_n_minus_one.remove_node(i)
@@ -147,23 +147,23 @@ class FlatDecrementor(Decrementor):
 
     Methods
     -------
-    decrement(R_s_t_n: set, early_stopping=None) -> dict
-        Decrements each graph in `R_s_t_n` by removing individual nodes to create unique
+    decrement(r_s_t_n: set, early_stopping=None) -> dict
+        Decrements each graph in `r_s_t_n` by removing individual nodes to create unique
         subgraphs, returning them as a set.
     """
 
     @classmethod
-    def decrement(cls, R_s_t_n: set, early_stopping=None) -> dict:
+    def decrement(cls, r_s_t_n: set, early_stopping=None) -> dict:
         """
-        Decrement each graph in `R_s_t_n` by removing nodes and storing unique subgraphs.
+        Decrement each graph in `r_s_t_n` by removing nodes and storing unique subgraphs.
 
-        For each graph in `R_s_t_n`, iteratively removes nodes to generate subgraphs, 
+        For each graph in `r_s_t_n`, iteratively removes nodes to generate subgraphs, 
         adding each non-isomorphic subgraph to the set `D`. The function halts early if 
         the `early_stopping` limit is reached.
 
         Parameters
         ----------
-        R_s_t_n : set of nx.Graph
+        r_s_t_n : set of nx.Graph
             Set of graphs to decrement by node removal operations.
         early_stopping : int, optional
             Limits the total number of decrementing iterations, halting early if reached.
@@ -177,17 +177,17 @@ class FlatDecrementor(Decrementor):
         D = set()
 
         # Get n
-        for G_n in R_s_t_n:
+        for G_n in r_s_t_n:
             n = G_n.order()
             break
 
-        total_graphs = len(R_s_t_n)
+        total_graphs = len(r_s_t_n)
         total_combinations = n * total_graphs
 
         with tqdm(total=total_combinations, desc="Decrementing combinations") as pbar:
             pbar.set_postfix(graph=f"0/{total_graphs}")
             iterations = 0
-            for idx, G_n in enumerate(R_s_t_n, start=1):
+            for idx, G_n in enumerate(r_s_t_n, start=1):
                 for i in range(n):
                     G_n_minus_one = G_n.copy()
                     G_n_minus_one.remove_node(i)
