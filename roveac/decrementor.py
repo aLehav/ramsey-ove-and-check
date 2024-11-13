@@ -17,7 +17,7 @@ from roveac.key_generator import TriangleGenerator
 
 class Decrementor:
     """
-    Abstract base class for generating a decremented Ramsey graph by analyzing subgraphs
+    Class for generating a decremented Ramsey graph by analyzing subgraphs
     and performing isomorphism checking.
 
     Methods
