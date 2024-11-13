@@ -44,6 +44,7 @@ class IsomorphismHasher(ABC):
         -------
         tuple[list, dict]
             A tuple containing:
+            
             - A list of keys in `D` that are isomorphic to `G`.
             - A dictionary representing the isomorphism data for the matches.
         """

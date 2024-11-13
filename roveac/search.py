@@ -60,8 +60,7 @@ class BaseSearch(Search):
 
     Methods
     -------
-    search(r_s_t_n: set, construct_dict, hash, check, generate_key, s: int, t: int, 
-           dict_early_stopping=None, search_early_stopping=None) -> list
+    search(r_s_t_n: set, construct_dict, hash, check, generate_key, s: int, t: int, dict_early_stopping=None, search_early_stopping=None) -> list
         Searches `R(s, t, n)` for any `R(s, t, n+1)` counterexamples by examining each graph's 
         potential neighbors and checking against specific conditions.
     """
