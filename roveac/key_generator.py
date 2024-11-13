@@ -26,7 +26,7 @@ class KeyGenerator:
         Produces a key based on the given graph.
     """
     @classmethod
-    def generate_key(cls, G: nx.Graph, method: str):
+    def generate_key(cls, G: nx.Graph, method: str = "triangle"):
         """
         Generate a unique key for the provided graph `G`.
 
