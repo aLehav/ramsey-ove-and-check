@@ -8,7 +8,7 @@ project = 'ROVEaC'
 copyright = '2024, Adam Lehavi'
 author = 'Adam Lehavi'
 
-version = '1.0.0'
+version = '2'
 release = version
 
 # -- General configuration
