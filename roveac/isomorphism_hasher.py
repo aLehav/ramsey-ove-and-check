@@ -53,8 +53,8 @@ class IsomorphismHasher:
             return cls._triangle_hash(G, D)
         if method == "sub_3":
             return cls._sub_3_hash(G, D)
-        if method == "vf2pp_iter":
-            return cls._vf2pp_iter_hash(G, D)
+        if method == "flat":
+            return cls._flat_hash(G, D)
         raise ValueError("Unknown method provided for hashing.")
     
     @classmethod
@@ -118,7 +118,7 @@ class IsomorphismHasher:
         raise RuntimeError("No isomorphism found.")
     
     @classmethod
-    def _vf2pp_iter_hash(cls, G: nx.Graph, D: dict) -> tuple[list, dict]:
+    def _flat_hash(cls, G: nx.Graph, D: dict) -> tuple[list, dict]:
         """
         Locate the graph in `D` that is isomorphic to `G`.
 
