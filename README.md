@@ -5,7 +5,8 @@ counterexample checking.
 
 ## Links
 - [Documentation](https://ramsey-ove-and-check.readthedocs.io/en/latest/)
-- [Repository](https://github.com/aLehav/ramsey-ove-and-check/commits/main/)
+- [Repository](https://github.com/aLehav/ramsey-ove-and-check/)
+- [Package](https://pypi.org/project/roveac/)
 - [Preprint](https://arxiv.org/abs/2411.04267)
 ## Notes
 Repository and documentation solely maintained by Adam M. Lehavi
