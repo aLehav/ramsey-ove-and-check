@@ -22,4 +22,4 @@ from .isomorphism_hasher import IsomorphismHasher
 from .key_generator import KeyGenerator
 
 # From searches
-from .search import Search
+from .extend import Extender

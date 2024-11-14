@@ -7,8 +7,8 @@ Ramsey graph based on specific parameters.
 
 Classes
 -------
-Search : ABC
-    Abstract base class for performing searches on Ramsey graphs.
+Search
+    Class for performing searches on Ramsey graphs.
 """
 
 from functools import reduce
@@ -17,56 +17,94 @@ from itertools import islice
 from concurrent.futures import ThreadPoolExecutor
 import threading
 import networkx as nx
+from roveac.counter_checker import CounterChecker
+from roveac.isomorphism_hasher import IsomorphismHasher
+from roveac.dict_constructor import DictConstructor
+from roveac.key_generator import KeyGenerator
 
-class Search:
+class Extender:
     """
-    Abstract base class for performing searches within a Ramsey graph.
+    Class for performing one vertex extension from a given ramsey graph.
 
     Methods
     -------
-    search(method: str, r_s_t_n: set, s: int, t: int) -> list
+    search(method: str, r_s_t_n: set, s: int, t: int, extension_method: str, dict_constructor_method: str, hash_method: str, check_method: str, generate_key_method: str, dict_early_stopping=None, search_early_stopping=None) -> list
         Searches within R(s, t, n) based on given parameters and returns a list of results.
     """
 
     @classmethod
-    def search(cls, method: str, r_s_t_n: set, s: int, t: int) -> list:
+    def extend(cls, r_s_t_n: set,  
+               s: int, 
+               t: int, 
+               extension_method: str, 
+               dict_constructor_method: str,
+               hash_method: str, 
+               check_method: str, 
+               generate_key_method: str,
+               dict_early_stopping=None, 
+               extend_early_stopping=None) -> list:
         """
         Perform a search within the graph R(s, t, n) based on the provided parameters.
 
         Parameters
         ----------
-        method: str
-            Denotes which method to use to construct the dictionary.
-        r_s_t_n : set
-            The set representing the current Ramsey graph R(s, t, n).
+        r_s_t_n : set of nx.Graph
+            Set of candidate graphs for the `R(s, t, n)` configuration.
         s : int
-            An integer parameter for the search criterion.
+            Size parameter for clique checks.
         t : int
-            An integer parameter for the search criterion.
+            Size parameter for independent set checks.
+        extension_method : str
+            Denotes which extension method to use.
+        dict_constructor_method : str
+            Denotes which `DictConstructor` method to use.
+        hash_method : str
+            Denotes which `IsomorphismHasher` method to use.
+        check_method : str
+            Denotes which `CounterChecker` method to use.
+        generate_key_method : str
+            Denotes which `KeyGenerator` method to use.
+        dict_early_stopping : int, optional
+            Stops dictionary construction after a specified number of iterations.
+        search_early_stopping : int, optional
+            Stops the search after a specified number of iterations.
 
         Returns
         -------
         list
             A list of results from the search within the Ramsey graph.
         """
-
-class BaseSearch(Search):
-    """
-    Determines the existence of `R(s, t, n+1)` counterexamples within a given `R(s, t, n)` set.
-
-    This class extends `Search` to evaluate if a set of candidate graphs contains any 
-    counterexamples for `R(s, t, n+1)`. Depending on the results, it concludes either 
-    that all counterexamples exist within the set (indicating `R(s, t) > n+1`), or that 
-    more elements may need to be examined or generated to fully determine `R(s, t) = n+1`.
-
-    Methods
-    -------
-    search(r_s_t_n: set, construct_dict, hash, check, generate_key, s: int, t: int, dict_early_stopping=None, search_early_stopping=None) -> list
-        Searches `R(s, t, n)` for any `R(s, t, n+1)` counterexamples by examining each graph's 
-        potential neighbors and checking against specific conditions.
-    """
+        if extension_method == "base":
+            return cls._base_extend(r_s_t_n=r_s_t_n,
+                                    dict_constructor_method=dict_constructor_method,
+                                    hash_method=hash_method, 
+                                    check_method=check_method, 
+                                    generate_key_method=generate_key_method, 
+                                    s=s, 
+                                    t=t, 
+                                    dict_early_stopping=dict_early_stopping, 
+                                    extend_early_stopping=extend_early_stopping)
+        if extension_method == "improved":
+            return cls._improved_extend(r_s_t_n=r_s_t_n,
+                                    dict_constructor_method=dict_constructor_method,
+                                    hash_method=hash_method, 
+                                    check_method=check_method, 
+                                    generate_key_method=generate_key_method, 
+                                    s=s, 
+                                    t=t, 
+                                    dict_early_stopping=dict_early_stopping, 
+                                    extend_early_stopping=extend_early_stopping)
     @classmethod
-    def search(cls, r_s_t_n: set, construct_dict, hash, check, generate_key, s:int, t:int, dict_early_stopping=None, search_early_stopping=None) -> list:
+    def _base_extend(cls, 
+                    r_s_t_n: set,  
+                    s: int, 
+                    t: int, 
+                    dict_constructor_method: str,
+                    hash_method: str, 
+                    check_method: str, 
+                    generate_key_method: str,
+                    dict_early_stopping=None, 
+                    extend_early_stopping=None) -> list:
         """
         Search `R(s, t, n)` for `R(s, t, n+1)` counterexamples through neighbor evaluation.
 
@@ -78,22 +116,22 @@ class BaseSearch(Search):
         ----------
         r_s_t_n : set of nx.Graph
             Set of candidate graphs for the `R(s, t, n)` configuration.
-        construct_dict : callable
-            Function to construct a dictionary `D` of subgraphs for efficient retrieval.
-        hash : callable
-            Hash function for identifying isomorphic subgraphs.
-        check : callable
-            Function for verifying if a graph qualifies as a counterexample.
-        generate_key : callable
-            Function to generate unique keys for identifying graph configurations.
         s : int
             Size parameter for clique checks.
         t : int
             Size parameter for independent set checks.
+        dict_constructor_method : str
+            Denotes which `DictConstructor` method to use.
+        hash_method : str
+            Denotes which `IsomorphismHasher` method to use.
+        check_method : str
+            Denotes which `CounterChecker` method to use.
+        generate_key_method : str
+            Denotes which `KeyGenerator` method to use.
         dict_early_stopping : int, optional
             Stops dictionary construction after a specified number of iterations.
-        search_early_stopping : int, optional
-            Stops the search after a specified number of iterations.
+        extend_early_stopping : int, optional
+            Stops the extend after a specified number of iterations.
 
         Returns
         -------
@@ -101,7 +139,7 @@ class BaseSearch(Search):
             List of counterexample graphs found in `R(s, t, n+1)`.
         """
         def check_and_add_counterexample(G_prime, L):
-            key = generate_key(G_prime)
+            key = KeyGenerator.generate_key(G_prime, method=generate_key_method)
             if key in L:
                 new_counterexample = True
                 for counterexample in L[key]:
@@ -144,11 +182,12 @@ class BaseSearch(Search):
 
         def check_and_update_counterexample(isomorphic_neighbors, keys_j, G_prime, G_n, i, j):
             if isomorphic_neighbors in reduce(lambda d, key: d[key], keys_j, D):
-                is_counter = check(
+                is_counter = CounterChecker.check(
+                    method=check_method,
                     G_n=G_n,
                     G_prime=G_prime,
                     D=D,
-                    hash=hash,
+                    hash_method=hash_method,
                     passed_indices=[i, j], # Maybe I add n to this?
                     n=n,
                     s=s,
@@ -158,7 +197,7 @@ class BaseSearch(Search):
                     check_and_add_counterexample(G_prime, L)
 
         L = {}
-        D = construct_dict(r_s_t_n=r_s_t_n, early_stopping=dict_early_stopping)
+        D = DictConstructor.construct_dict(r_s_t_n=r_s_t_n, method=dict_constructor_method, early_stopping=dict_early_stopping)
         # print_set_lengths(D)
 
         # Get n
@@ -181,18 +220,18 @@ class BaseSearch(Search):
                 for i in range(n):
                     G_n_min_i = G_n.copy()
                     G_n_min_i.remove_node(i)
-                    keys_i, isomorphism_i = hash(G=G_n_min_i,D=D)
+                    keys_i, isomorphism_i = IsomorphismHasher.hash(G=G_n_min_i, D=D, method=hash_method)
                     G_n_min_j = G_n.copy()
                     j = (i+1) % n
                     G_n_min_j.remove_node(j)
-                    keys_j, isomorphism_j = hash(G=G_n_min_j,D=D)
+                    keys_j, isomorphism_j = IsomorphismHasher.hash(G=G_n_min_j, D=D, method=hash_method)
                     process_neighbors(G_prime, G_n, G_n_min_i, keys_i, isomorphism_i, G_n_min_j, keys_j, isomorphism_j, i, j)
                     pbar.update(1)
                     iterations += 1
-                    if (search_early_stopping is not None) and (iterations >= search_early_stopping):
+                    if (extend_early_stopping is not None) and (iterations >= extend_early_stopping):
                         break
 
-                if (search_early_stopping is not None) and (iterations >= search_early_stopping):
+                if (extend_early_stopping is not None) and (iterations >= extend_early_stopping):
                     break
                 pbar.set_postfix(graph=f"{idx}/{total_graphs}")
 
@@ -202,44 +241,19 @@ class BaseSearch(Search):
 
         return flattened_L
     
-class ImprovedSearch(Search):
-    """
-    Searches `R(s, t, n)` to identify any `R(s, t, n+1)` counterexamples within a given set of graphs.
-
-    This class extends `Search` to perform an optimized, parallelized search for potential counterexamples.
-    It provides a conclusion of either "yes, L has all counterexamples" (implying `R(s, t) > n+1`) or "no," 
-    suggesting that `R(s, t, n)` might need additional elements or that `R(s, t) = n+1`.
-
-    Parameters
-    ----------
-    r_s_t_n : set
-        The full set of counterexample graphs to evaluate.
-    construct_dict : callable
-        Function to construct the dictionary `D` of subgraphs.
-    hash : callable
-        Hash function used to identify isomorphic subgraphs.
-    check : callable
-        Function that checks if a graph qualifies as a counterexample.
-    generate_key : callable
-        Function for generating a unique key for each graph.
-    s : int
-        Parameter defining the size of cliques to check.
-    t : int
-        Parameter defining the size of independent sets to check.
-    dict_early_stopping : int or None, optional
-        Limits the number of dictionary construction iterations if specified.
-    search_early_stopping : int or None, optional
-        Limits the total search iterations if specified.
-
-    Methods
-    -------
-    search(r_s_t_n: set, construct_dict, hash, check, generate_key, s: int, t: int, dict_early_stopping=None, search_early_stopping=None) -> list
-        Conducts a parallelized search for counterexamples in `R(s, t, n+1)` using neighbor-based evaluations.
-    """
     @classmethod
-    def search(cls, r_s_t_n: set, construct_dict, hash, check, generate_key, s:int, t:int, dict_early_stopping=None, search_early_stopping=None) -> list:
+    def _improved_extend(cls, 
+                        r_s_t_n: set,  
+                        s:int, 
+                        t:int, 
+                        dict_constructor_method: str,
+                        hash_method: str, 
+                        check_method: str, 
+                        generate_key_method: str,
+                        dict_early_stopping=None, 
+                        extend_early_stopping=None) -> list:
         """
-        Perform a parallelized search on `R(s, t, n)` to identify `R(s, t, n+1)` counterexamples.
+        Perform a parallelized extend on `R(s, t, n)` to identify `R(s, t, n+1)` counterexamples.
 
         This method iterates through each graph in `r_s_t_n`, adding a new node (`v'`) to each 
         to create candidate graphs for `R(s, t, n+1)`. It evaluates neighbors, applies isomorphism 
@@ -248,23 +262,23 @@ class ImprovedSearch(Search):
         Parameters
         ----------
         r_s_t_n : set of nx.Graph
-            Set of graphs representing the current counterexample candidates.
-        construct_dict : callable
-            Function for constructing a dictionary `D` of subgraphs to optimize lookups.
-        hash : callable
-            Function for hashing subgraphs to identify isomorphic structures.
-        check : callable
-            Function to verify if a graph qualifies as a counterexample.
-        generate_key : callable
-            Function to generate unique keys for identifying graph configurations.
+            Set of candidate graphs for the `R(s, t, n)` configuration.
         s : int
-            The size of cliques to check.
+            Size parameter for clique checks.
         t : int
-            The size of independent sets to check.
+            Size parameter for independent set checks.
+        dict_constructor_method : str
+            Denotes which `DictConstructor` method to use.
+        hash_method : str
+            Denotes which `IsomorphismHasher` method to use.
+        check_method : str
+            Denotes which `CounterChecker` method to use.
+        generate_key_method : str
+            Denotes which `KeyGenerator` method to use.
         dict_early_stopping : int, optional
-            Stops dictionary construction early if specified.
-        search_early_stopping : int, optional
-            Limits the number of search iterations if specified.
+            Stops dictionary construction after a specified number of iterations.
+        extend_early_stopping : int, optional
+            Stops the extend after a specified number of iterations.
 
         Returns
         -------
@@ -273,7 +287,7 @@ class ImprovedSearch(Search):
         """
         lock = threading.Lock()
         L = {}
-        D = construct_dict(r_s_t_n=r_s_t_n, early_stopping=dict_early_stopping)
+        D = DictConstructor.construct_dict(r_s_t_n=r_s_t_n, method=dict_constructor_method, early_stopping=dict_early_stopping)
 
         # Get n
         for G_n in r_s_t_n:
@@ -285,15 +299,15 @@ class ImprovedSearch(Search):
         total_iterations = num_counterexamples * n
 
         # Adjust total iterations if early stopping is set
-        if search_early_stopping is not None:
-            total_iterations = min(total_iterations, search_early_stopping)
+        if extend_early_stopping is not None:
+            total_iterations = min(total_iterations, extend_early_stopping)
 
         # Create an iterator over all combinations of idx and i
         idx_i_iterator = ((idx, G_n, i) for idx, G_n in enumerate(r_s_t_n, start=1) for i in range(n))
 
         # Apply early stopping using islice
-        if search_early_stopping is not None:
-            idx_i_iterator = islice(idx_i_iterator, search_early_stopping)
+        if extend_early_stopping is not None:
+            idx_i_iterator = islice(idx_i_iterator, extend_early_stopping)
 
         args_list = list(idx_i_iterator)
 
@@ -308,13 +322,13 @@ class ImprovedSearch(Search):
                 # Remove node i
                 G_n_min_i = G_n.copy()
                 G_n_min_i.remove_node(i)
-                keys_i, isomorphism_i = hash(G=G_n_min_i, D=D)
+                keys_i, isomorphism_i = IsomorphismHasher.hash(G=G_n_min_i, D=D, method=hash_method)
 
                 # Remove node j
                 j = (i + 1) % n
                 G_n_min_j = G_n.copy()
                 G_n_min_j.remove_node(j)
-                keys_j, isomorphism_j = hash(G=G_n_min_j, D=D)
+                keys_j, isomorphism_j = IsomorphismHasher.hash(G=G_n_min_j, D=D, method=hash_method)
 
                 # Process neighbors
                 process_neighbors(G_prime, G_n, keys_i, isomorphism_i, keys_j, isomorphism_j, i, j)
@@ -347,11 +361,12 @@ class ImprovedSearch(Search):
 
             def check_and_update_counterexample(isomorphic_neighbors, keys_j, G_prime, G_n, i, j):
                 if isomorphic_neighbors in reduce(lambda d, key: d[key], keys_j, D):
-                    is_counter = check(
+                    is_counter = CounterChecker.check(
+                        method=check_method,
                         G_n=G_n,
                         G_prime=G_prime,
                         D=D,
-                        hash=hash,
+                        hash_method=hash_method,
                         passed_indices=[i, j, n],
                         n=n,
                         s=s,
@@ -361,7 +376,7 @@ class ImprovedSearch(Search):
                         check_and_add_counterexample(G_prime)
 
             def check_and_add_counterexample(G_prime):
-                key = generate_key(G_prime)
+                key = KeyGenerator.generate_key(G_prime, method=generate_key_method)
                 with lock:
                     if key in L:
                         new_counterexample = True
