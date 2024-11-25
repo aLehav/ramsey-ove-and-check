@@ -144,8 +144,8 @@ class CounterChecker:
                 The primary graph to check subgraphs within.
             - G_prime : nx.Graph
                 A reference graph for neighbor checks.
-            - D : dict
-                Dictionary for hashed subgraph lookups.
+            - mapping : dict
+                Mapping for hashed subgraph lookups.
             - hasher : callable
                 Hashing function for subgraphs.
             - passed_indices : set
@@ -164,7 +164,7 @@ class CounterChecker:
         """
         G_n = kwargs["G_n"]
         G_prime = kwargs["G_prime"]
-        D = kwargs["D"]
+        mapping = kwargs["mapping"]
         hash_method = kwargs["hash_method"]
         passed_indices = kwargs["passed_indices"]
         n = kwargs["n"]
@@ -177,14 +177,14 @@ class CounterChecker:
             if i not in passed_indices:
                 G_n_min_i = G_n.copy()
                 G_n_min_i.remove_node(i)
-                keys, isomorphism = IsomorphismHasher.hash(G=G_n_min_i, D=D, method=hash_method)
+                keys, isomorphism = IsomorphismHasher.hash(G=G_n_min_i, mapping=mapping, method=hash_method)
 
                 v_n_neighbors = set(G_prime.neighbors(n))
                 v_n_neighbors.discard(i)
                 iso_neighbors = tuple(sorted([isomorphism[neighbor] for 
                                               neighbor in v_n_neighbors], reverse=True))
 
-                if iso_neighbors not in reduce(lambda d, key: d[key], keys, D):
+                if iso_neighbors not in reduce(lambda d, key: d[key], keys, mapping):
                     return False
 
                 checks_performed += 1
