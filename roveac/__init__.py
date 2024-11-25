@@ -12,8 +12,8 @@ from .counter_checker import CounterChecker  # adjust with the actual class or f
 # From decrementors
 from .decrementor import Decrementor
 
-# From dict_constructors
-from .dict_constructor import DictConstructor
+# From mapping_constructors
+from .mapping_constructor import MappingConstructor
 
 # From isomorphism_hashers
 from .isomorphism_hasher import IsomorphismHasher
