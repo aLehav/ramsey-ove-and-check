@@ -142,14 +142,8 @@ class MappingConstructor:
                         isomorphisms = list(nx.isomorphism.vf2pp_all_isomorphisms(G_n_minus_one, G_index))
                         neighbors = set(G_n.neighbors(i))
                         mapping[key] = {}
-                        for isomorphism in isomorphisms:           
-                            isomorphic_neighbors = tuple(sorted((isomorphism[neighbor] for neighbor in neighbors), reverse=True))
-                            if G_n_minus_one in mapping[key]:
-                                mapping[key][G_n_minus_one].add(isomorphic_neighbors)
-                            else:
-                                mapping[key][G_n_minus_one] = set([isomorphic_neighbors])
                     if G_index not in mapping[key]:
-                        mapping[key][G_index] = {}
+                        mapping[key][G_index] = set()
                     neighbors = set(G_n.neighbors(i))
                     for isomorphism in isomorphisms:
                         isomorphic_neighbors = tuple(sorted((isomorphism[neighbor] for neighbor in neighbors), reverse=True))

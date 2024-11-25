@@ -233,7 +233,7 @@ class Extender:
             process_neighbors(G_prime, G_n, keys_i, isomorphism_i, keys_j, isomorphism_j, i, j, parallel)
 
             pbar.update(1)
-            pbar.set_postfix(graph=f"{idx}/{num_counterexamples}")
+            pbar.set_postfix(graph=f"{idx}/{num_counterexamples}", refresh=False)
 
         def process_neighbors(G_prime, G_n, keys_i, isomorphism_i, keys_j, isomorphism_j, i, j, parallel):
             inv_isomorphism_i = {v: k for k, v in isomorphism_i.items()}
@@ -272,11 +272,10 @@ class Extender:
 
         args_list = list(idx_i_iterator)
 
-        with tqdm(total=total_iterations, desc="Searching dict") as pbar:
+        with tqdm(total=total_iterations, desc="OVE") as pbar:
             if not parallel:
-                with tqdm(total=total_iterations, desc="OVE") as pbar:
-                    for args in args_list:
-                        process_idx_i(args, parallel=False)
+                for args in args_list:
+                    process_idx_i(args, parallel=False)
             else:
                 with ThreadPoolExecutor() as executor:
                     list(executor.map(lambda args: process_idx_i(args, parallel=True), args_list))
