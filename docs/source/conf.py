@@ -5,8 +5,10 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- Project information
 
 project = 'ROVEaC'
-copyright = '2024, Adam Lehavi'
-author = 'Adam Lehavi'
+# copyright = '2024, Adam Lehavi'
+# author = 'Adam Lehavi'
+copyright = '2024, Anonymized for Paper Submission'
+author = 'Anonymized for Paper Submission'
 
 version = '1.0.0'
 release = version

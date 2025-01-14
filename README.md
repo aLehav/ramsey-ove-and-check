@@ -2,9 +2,9 @@
 
 Ramsey One-Vertex Extension and Checking (ROVEaC) is a Python package for extending ramsey theory counterexample sets and testing the belonging of a candidate graph to a given ramsey set.
 - [Documentation](https://ramsey-ove-and-check.readthedocs.io/en/latest/)
-- [Source](https://github.com/aLehav/ramsey-ove-and-check/)
-- [Package](https://pypi.org/project/roveac/)
-- [Related Preprint](https://arxiv.org/abs/2411.04267)
+<!-- - [Source](https://github.com/aLehav/ramsey-ove-and-check/) -->
+<!-- - [Package](https://pypi.org/project/roveac/) -->
+<!-- - [Related Preprint](https://arxiv.org/abs/2411.04267) -->
   
 ## Install
 Install the latest released version of ROVEaC with dependencies
@@ -24,5 +24,5 @@ assert len(r46_36) == 0
 assert len(r55_43) == 0
 ```
 
-## Notes
-Repository and documentation solely maintained by Adam M. Lehavi
+<!-- ## Notes
+Repository and documentation solely maintained by Adam M. Lehavi -->
